@@ -28,14 +28,23 @@ except:
 pygame.init()
 
 # Create the display surface object of specific dimensions 
-win = pygame.display.set_mode((500, 500))
+screen_width = 500
+screen_height = 500
+win = pygame.display.set_mode((screen_width, screen_height))
 
 # Set the Pygame window name
 pygame.display.set_caption("Ramjam")
 
 # Load and transform the background image 1
 #background_1 = os.path.abspath("Background/Background.png")
-background_1 = "Background.png"
+background_1 = "Background1.png"
+background_2 = "Background2.png"
+background_3 = "Background3.png"
+background_4 = "Background4.png"
+# background_1 = os.path.abspath("Background/Background1.png")
+# background_2 = os.path.abspath("Background/Background2.png")
+# background_3 = os.path.abspath("Background/Background3.png")
+# background_4 = os.path.abspath("Background/Background4.png")
 
 # Variable to iterate over the background image
 iterator = 0    # Start at 0 and iterate along width of screen
@@ -84,15 +93,33 @@ def load_background(img_location, iterator):
         print(f"Error loading background image: {e}")
         sys.exit(1)
 
+    # Transform the background image
+    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+
     win.blit(background_image, (iterator, 0))
 
-    # Load background
-    if iterator == -car_w:
-        win.blit(background_image, (car_w+iterator, 0))
+    win.blit(background_image, (screen_width+iterator, 0))
+    if iterator == -screen_width:
+        win.blit(background_image, (screen_width+iterator, 0))
+        iterator = 0
+    print(iterator)
+    iterator += 1
+
+def update_background(img_location, iterator):
+    try:
+        background_image = pygame.image.load(img_location)
+    except pygame.error as e:
+        print(f"Error loading background image: {e}")
+        sys.exit(1)
+
+    # Load background and iterate over it
+    #win.blit(background_image, (screen_width+iterator, 0))
+    win.blit(background_image, (screen_width+iterator, 0))
+    if iterator == -screen_width:
+        win.blit(background_image, (screen_width+iterator, 0))
         iterator = 0
 
-    iterator -= 1
-
+    #iterator -= 1
 
 # Load the car image
 car_image_trex = os.path.abspath("Character_Sprites/Bee_Car2.png")
@@ -134,11 +161,21 @@ timer = pygame.time.Clock()
 while not crashed:
     pygame.time.delay(10)
     # Clear the screen
-    win.fill((255, 255, 255))
+    win.fill((0, 0, 0))
 
-    
+    if iterator == 0:
+        img = background_1
+    elif iterator == 1:
+        img = background_2
+    elif iterator == 2:
+        img = background_3
+    elif iterator == 3:
+        img = background_4
+
     #win.blit(background_image, (iterator, 0))
-    iterator -= 1
+    load_background(img, iterator)
+    #update_background(background_1, iterator)
+    iterator-=1
 
     #Start the mic recording. (You can comment the next line out to ignore)
     micFunction(stream.read(CHUNK))
@@ -169,7 +206,7 @@ while not crashed:
 
 
     # If the car goes off the right side of the window, reset its position
-    if x > 600:
+    if x > screen_width + 50:
         x = 0 - car_rect.width
 
     # Store keys pressed
@@ -180,10 +217,10 @@ while not crashed:
         y -= current_vel
 
     # Move down
-    if keys[pygame.K_DOWN] and y < 600 - car_rect.height:
+    if keys[pygame.K_DOWN] and y < (screen_height + 100) - car_rect.height:
         y += current_vel
 
-    load_background(background_1, iterator)
+    #load_background(background_1, iterator)
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
