@@ -50,9 +50,16 @@ background_4 = "Background4.png"
 iterator = 0    # Start at 0 and iterate along width of screen
 
 
-#Load the sound
-#soundA_path = os.path.abspath("Effects/Accerlation-engine.wav")
-soundA=pygame.mixer.Sound("Accerlation-engine.wav")
+#Load the in all sound effects
+soundAccel=pygame.mixer.Sound("./Effects/Acceleration.wav")
+soundIdle=pygame.mixer.Sound("./Effects/idleEngine.wav")
+soundStart=pygame.mixer.Sound("./Effects/startEngine.wav")
+soundStop=pygame.mixer.Sound("./Effects/stopEngine.wav")
+soundBanana=pygame.mixer.Sound("./Effects/banana.wav")
+soundMonkey=pygame.mixer.Sound("./Effects/monkey_sounds.wav")
+soundBounce=pygame.mixer.Sound("./Effects/bounce_tires.wav")
+soundSkid=pygame.mixer.Sound("./Effects/car_skids.wav")
+soundScream=pygame.mixer.Sound("./Effects/screaming.wav")
 
 #Set up the microphone recording 
 FORMAT = pyaudio.paInt16 # We use 16bit format per sample
@@ -75,16 +82,37 @@ def micFunction(in_data):
     audio_data = np.fromstring(in_data, np.int16)
     dfft = 10.*np.log10(abs(np.fft.rfft(audio_data)))
     maxLocation=np.argmax(dfft)
-    print("MAX=", maxLocation)
+    #To do: Debounce me
+    #maxLocation corresponds to the frequency of the most intense sound
+    #of the word spoken in to the microphone. The word Cold has a low frequency
+    #starting sound. Chime has a medium frequency, and Soup starts with a high
+    #frequency.
+    if((maxLocation>15) and(maxLocation<40 )):
+        slowAction()
+    elif((maxLocation>40) and (maxLocation<90) ):
+        jumpAction()
+    elif (maxLocation>90):
+        startStopAction()
+     
+
 
 
 #Separate thread for the sound effect
 def accel_sound_function():
-    soundA.play(0)
-    pygame.time.delay(1000)
-    soundA.stop()
+    soundAccel.play(0)
+    pygame.time.delay(1000)  #Play the sound for 1000 milliseconds
+    soundAccel.stop()
     sys.exit()
 
+
+def startStopAction():
+    print("Soup")
+
+def jumpAction():
+    print("Chime")
+
+def slowAction():
+    print("Cold")
 
 def load_background(img_location, iterator):
     try:
