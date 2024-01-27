@@ -21,9 +21,12 @@ try:
     from scipy.io import wavfile
     import time
     import seaborn as sns
+    from ctypes import c_int64
+    
 except:
     print("Something didn't import")
- 
+
+
 # Initialize Pygame
 pygame.init()
 
@@ -109,23 +112,36 @@ stream = audio.open(format=FORMAT,
                     rate=RATE,
                     input=True)
 stream.start_stream()
-
+#The next two variables are globals used for debounce of the microphone.
+#I'm using a list with one element because lists are mutable, and
+#mutable globals are passed by reference into functions.
+soundTimeOne=[0]
+soundTimeTwo=[0]
+ 
 #Function for mic in
-def micFunction(in_data):
+def micFunction(in_data, soundOne, soundTwo):
+    soundOne[0]=pygame.time.get_ticks()
     audio_data = np.fromstring(in_data, np.int16)
     dfft = 10.*np.log10(abs(np.fft.rfft(audio_data)))
     maxLocation=np.argmax(dfft)
-    #To do: Debounce me
     #maxLocation corresponds to the frequency of the most intense sound
     #of the word spoken in to the microphone. The word Cold has a low frequency
     #starting sound. Chime has a medium frequency, and Soup starts with a high
     #frequency.
-    if((maxLocation>15) and(maxLocation<40 )):
-        slowAction()
-    elif((maxLocation>40) and (maxLocation<90) ):
-        jumpAction()
-    elif (maxLocation>90):
-        startStopAction()
+    
+    #The if statement is for the debouncing of the mic.
+    #Only go on if it is more than 200ms since the last sound.
+    if(soundOne[0]>(soundTwo[0]+200)):
+
+        soundTwo[0]=pygame.time.get_ticks()
+        soundTimeTwo[0]=soundTwo[0]
+        
+        if((maxLocation>15) and(maxLocation<40 )):
+            slowAction()
+        elif((maxLocation>40) and (maxLocation<90) ):
+            jumpAction()
+        elif (maxLocation>90):
+            startStopAction()
      
 
 
@@ -186,6 +202,7 @@ def update_background(img_location, iterator):
 
 # Load the car image
 car_image_trex = os.path.abspath("Character_Sprites/Bee_Car2.png")
+banana_peel_image = "Banana_Peel.png"
 
 #TODO: Loading screen for game to start
 #TODO: Add this to a function and call in load
@@ -199,6 +216,10 @@ car_rect_orig = car_image_object.get_rect()
 car_w, car_h = 100, 75
 car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
 car_rect = car_image_object.get_rect()
+
+banana_w, banana_h = 50, 50
+banana_peel_active = False  # Flag to indicate if the banana peel is active
+banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 
 # Object current coordinates
 # x = 0
@@ -220,6 +241,8 @@ crashed = False
 move_up = False
 timer = pygame.time.Clock()
 
+banana_peel_active = True
+
 # Infinite loop
 while not crashed:
     pygame.time.delay(10)
@@ -233,7 +256,7 @@ while not crashed:
     
 
     #Start the mic recording. (You can comment the next line out to ignore)
-    micFunction(stream.read(CHUNK))
+    micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -289,6 +312,19 @@ while not crashed:
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
+
+    if banana_peel_active :
+        #print("banana peel active!!")
+        win.blit(pygame.image.load(banana_peel_image), (300, 420))  # Keep y-coordinate as 420
+        #print(300-x)
+        # if banana_peel_timer <= 0:
+        if  300-x<=80:
+            print(x)
+
+            banana_peel_active = False  # Deactivate the banana peel
+            print("banana peel deactivated!!")
+            # banana_peel_x = random.randint(0, win_width - banana_w)
+            # banana_peel_timer = 5 * 30  # Reset the timer
 
     # Refresh the window
     pygame.display.update()
