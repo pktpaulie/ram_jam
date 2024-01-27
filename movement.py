@@ -37,6 +37,10 @@ pygame.display.set_caption("Ramjam")
 #background_1 = os.path.abspath("Background/Background.png")
 background_1 = "Background.png"
 
+# Variable to iterate over the background image
+iterator = 0    # Start at 0 and iterate along width of screen
+
+
 #Load the sound
 #soundA_path = os.path.abspath("Effects/Accerlation-engine.wav")
 soundA=pygame.mixer.Sound("Accerlation-engine.wav")
@@ -73,15 +77,21 @@ def accel_sound_function():
     sys.exit()
 
 
-def load_background(img_location):
+def load_background(img_location, iterator):
     try:
         background_image = pygame.image.load(img_location)
     except pygame.error as e:
         print(f"Error loading background image: {e}")
         sys.exit(1)
 
+    win.blit(background_image, (iterator, 0))
+
     # Load background
-    win.blit(background_image, (0, 0))
+    if iterator == -car_w:
+        win.blit(background_image, (car_w+iterator, 0))
+        iterator = 0
+
+    iterator -= 1
 
 
 # Load the car image
@@ -115,7 +125,7 @@ acceleration_factor = 1.2
 # Current velocity
 current_vel = 0
 
-# Indicates Pygame is running
+# Indicates Pygame is running/ not crashed
 crashed = False
 
 timer = pygame.time.Clock()
@@ -125,6 +135,10 @@ while not crashed:
     pygame.time.delay(10)
     # Clear the screen
     win.fill((255, 255, 255))
+
+    
+    #win.blit(background_image, (iterator, 0))
+    iterator -= 1
 
     #Start the mic recording. (You can comment the next line out to ignore)
     micFunction(stream.read(CHUNK))
@@ -169,7 +183,7 @@ while not crashed:
     if keys[pygame.K_DOWN] and y < 600 - car_rect.height:
         y += current_vel
 
-    load_background(background_1)
+    load_background(background_1, iterator)
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
