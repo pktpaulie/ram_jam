@@ -30,7 +30,7 @@ car_image_trex = "TRex_Car2.png"
 #TODO: Loading screen for game to start
 #TODO: Add this to a function and call in load
 #TODO: Background for next scene / loop background for current level then load new bg for new level
-# TODO: Bigger images??
+#TODO: Bigger images??
 
 car_image_object = pygame.image.load(car_image_trex)
 car_rect_orig = car_image_object.get_rect()
