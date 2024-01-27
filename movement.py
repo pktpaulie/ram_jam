@@ -1,7 +1,7 @@
 import pygame
 import sys
 from threading import Thread
-
+import os
  
 # Initialize Pygame
 pygame.init()
@@ -13,7 +13,7 @@ win = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("Ramjam")
 
 # Load the background image 1
-background_i = "Background.png"
+background_i = os.path.abspath("Scenes/Background.png")
 
 #Load the sound
 soundA=pygame.mixer.Sound("Accerlation-engine.wav")
