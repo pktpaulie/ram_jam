@@ -1,7 +1,19 @@
+#Audio recording and fft came from the example at
+#https://gist.github.com/ZWMiller/53232427efc5088007cab6feee7c6e4c
+
 import pygame
 import sys
 from threading import Thread
 
+try:
+    import pyaudio
+    import numpy as np
+    import pylab
+    from scipy.io import wavfile
+    import time
+    import seaborn as sns
+except:
+    print("Something didn't import")
  
 # Initialize Pygame
 pygame.init()
@@ -17,6 +29,30 @@ background_i = "Background.png"
 
 #Load the sound
 soundA=pygame.mixer.Sound("Accerlation-engine.wav")
+
+#Set up the microphone recording 
+FORMAT = pyaudio.paInt16 # We use 16bit format per sample
+CHANNELS = 1
+RATE = 44100
+CHUNK = 1024 # 1024bytes of data red from a buffer
+RECORD_SECONDS = 0.1
+WAVE_OUTPUT_FILENAME = "file.wav"
+
+audio = pyaudio.PyAudio()
+# start Recording
+stream = audio.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True)
+stream.start_stream()
+
+#Function for mic in
+def micFunction(in_data):
+    audio_data = np.fromstring(in_data, np.int16)
+    dfft = 10.*np.log10(abs(np.fft.rfft(audio_data)))
+    maxLocation=np.argmax(dfft)
+    print("MAX=", maxLocation)
+
 
 #Separate thread for the sound effect
 def accel_sound_function():
@@ -78,6 +114,9 @@ while not crashed:
     pygame.time.delay(10)
     # Clear the screen
     win.fill((255, 255, 255))
+
+    #Start the mic recording. (You can comment the next line out to ignore)
+    micFunction(stream.read(CHUNK))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
