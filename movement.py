@@ -166,7 +166,11 @@ while not crashed:
     # Refresh the window
     pygame.display.update()
     timer.tick(30)
+# Close up mic recording
+stream.stop_stream()
+stream.close()
 
+audio.terminate()
 # Close the Pygame window
 pygame.quit()
 sys.exit()
