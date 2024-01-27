@@ -4,24 +4,47 @@ import sys
 # Initialize Pygame
 pygame.init()
 
-# Create the display surface object of specific dimensions (600, 600)
-win = pygame.display.set_mode((600, 600))
+# Create the display surface object of specific dimensions 
+win = pygame.display.set_mode((500, 500))
 
 # Set the Pygame window name
 pygame.display.set_caption("Ramjam")
 
-# Load the background image
-background_image = pygame.image.load("background_image.jpg")  # Replace with your background image file path
+# Load the background image 1
+background_i = "Background.png"
+
+def load_background(img_location):
+    try:
+        background_image = pygame.image.load(img_location)
+    except pygame.error as e:
+        print(f"Error loading background image: {e}")
+        sys.exit(1)
+
+    # Load background
+    win.blit(background_image, (0, 0))
 
 
 # Load the car image
-image = "TRex_Car2.png"
-car_image_object = pygame.image.load(image)
+car_image_trex = "TRex_Car2.png"
+
+#TODO: Loading screen for game to start
+#TODO: Add this to a function and call in load
+#TODO: Background for next scene / loop background for current level then load new bg for new level
+# TODO: Bigger images??
+
+car_image_object = pygame.image.load(car_image_trex)
+car_rect_orig = car_image_object.get_rect()
+
+#Scale image
+car_w, car_h = 100, 75
+car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
 car_rect = car_image_object.get_rect()
 
 # Object current coordinates
+# x = 0
+# y = 200
 x = 0
-y = 200
+y = 380 #410
 
 # Initial velocity / speed of movement
 initial_vel = 1
@@ -63,6 +86,7 @@ while not crashed:
     # Move the car continuously in the positive x-direction
     x += current_vel
 
+
     # If the car goes off the right side of the window, reset its position
     if x > 600:
         x = 0 - car_rect.width
@@ -77,6 +101,8 @@ while not crashed:
     # Move down
     if keys[pygame.K_DOWN] and y < 600 - car_rect.height:
         y += current_vel
+
+    load_background(background_i)
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
