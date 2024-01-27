@@ -170,8 +170,10 @@ def update_background(img_location, iterator):
     #iterator -= 1
 
 # Load the car image
-car_image_trex = os.path.abspath("Character_Sprites/Bee_Car2.png")
+car_image_bee = os.path.abspath("Character_Sprites/Bee_Car2.png")
 banana_peel_image = "Banana_Peel.png"
+car_image_trex = os.path.abspath("Character_Sprites/TRex_Car2.png")
+car_image_chicken=os.path.abspath("Character_Sprites/Chicken_Car2.png")
 
 #TODO: Loading screen for game to start
 #TODO: Add this to a function and call in load
@@ -180,6 +182,7 @@ banana_peel_image = "Banana_Peel.png"
 
 car_image_object = pygame.image.load(car_image_trex)
 car_rect_orig = car_image_object.get_rect()
+car_number=0
 
 #Scale image
 car_w, car_h = 100, 75
@@ -253,6 +256,25 @@ while not crashed:
                     current_vel -= acceleration_factor
                 else:
                     current_vel = 0
+            #change car style if user presses C
+            elif event.key == pygame.K_c:
+                car_w, car_h = 100, 75
+                if(car_number==0):
+                    car_image_object = pygame.image.load(car_image_bee)
+                    car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
+                    car_rect = car_image_object.get_rect()
+                elif(car_number==1):
+                    car_image_object = pygame.image.load(car_image_chicken)
+                    car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
+                    car_rect = car_image_object.get_rect()
+                elif(car_number==2):
+                    car_image_object = pygame.image.load(car_image_trex)
+                    car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
+                    car_rect = car_image_object.get_rect()
+                car_number=(car_number+1)%3
+
+
+                    
 
     
 
