@@ -49,6 +49,9 @@ background_4 = "Background4.png"
 # Variable to iterate over the background image
 iterator = 0    # Start at 0 and iterate along width of screen
 
+# Current velocity
+current_vel = 0
+
 
 #Load the in all sound effects
 soundAccel=pygame.mixer.Sound("./Effects/Acceleration.wav")
@@ -123,15 +126,17 @@ def load_background(img_location, iterator):
 
     # Transform the background image
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
-
-    win.blit(background_image, (iterator, 0))
-
-    win.blit(background_image, (screen_width+iterator, 0))
-    if iterator == -screen_width:
+    
+    win.blit(background_image, (0, 0))
+    if current_vel != 0: 
+        win.blit(background_image, (iterator, 0))  
         win.blit(background_image, (screen_width+iterator, 0))
-        iterator = 0
-    print(iterator)
-    iterator += 1
+        if iterator == -screen_width:
+            win.blit(background_image, (screen_width+iterator, 0))
+            iterator = 0
+        iterator -= 1
+    else:
+        win.blit(background_image, (0, 0))
 
 def update_background(img_location, iterator):
     try:
@@ -141,7 +146,6 @@ def update_background(img_location, iterator):
         sys.exit(1)
 
     # Load background and iterate over it
-    #win.blit(background_image, (screen_width+iterator, 0))
     win.blit(background_image, (screen_width+iterator, 0))
     if iterator == -screen_width:
         win.blit(background_image, (screen_width+iterator, 0))
@@ -177,8 +181,7 @@ initial_vel = 1
 # Acceleration factor
 acceleration_factor = 1.2
 
-# Current velocity
-current_vel = 0
+
 
 # Indicates Pygame is running/ not crashed
 crashed = False
@@ -227,6 +230,7 @@ while not crashed:
                     current_vel -= acceleration_factor
                 else:
                     current_vel = 0
+
     
 
     # Move the car continuously in the positive x-direction
