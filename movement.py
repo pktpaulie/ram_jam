@@ -1,6 +1,8 @@
 import pygame
 import sys
+from threading import Thread
 
+ 
 # Initialize Pygame
 pygame.init()
 
@@ -12,6 +14,17 @@ pygame.display.set_caption("Ramjam")
 
 # Load the background image 1
 background_i = "Background.png"
+
+#Load the sound
+soundA=pygame.mixer.Sound("Accerlation-engine.wav")
+
+#Separate thread for the sound effect
+def accel_sound_function():
+    soundA.play(0)
+    pygame.time.delay(1000)
+    soundA.stop()
+    sys.exit()
+
 
 def load_background(img_location):
     try:
@@ -77,11 +90,15 @@ while not crashed:
                     current_vel = 10
                 else:
                     current_vel += acceleration_factor
+                    T=Thread(target=accel_sound_function)
+                    T.start()
+                     
             elif event.key == pygame.K_LEFT:
                 if current_vel > 0:
                     current_vel -= acceleration_factor
                 else:
                     current_vel = 0
+    
 
     # Move the car continuously in the positive x-direction
     x += current_vel
@@ -114,5 +131,7 @@ while not crashed:
 # Close the Pygame window
 pygame.quit()
 sys.exit()
+
+
 
 
