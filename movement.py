@@ -155,6 +155,7 @@ def update_background(img_location, iterator):
 
 # Load the car image
 car_image_trex = os.path.abspath("Character_Sprites/Bee_Car2.png")
+banana_peel_image = "Banana_Peel.png"
 
 #TODO: Loading screen for game to start
 #TODO: Add this to a function and call in load
@@ -168,6 +169,10 @@ car_rect_orig = car_image_object.get_rect()
 car_w, car_h = 100, 75
 car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
 car_rect = car_image_object.get_rect()
+
+banana_w, banana_h = 50, 50
+banana_peel_active = False  # Flag to indicate if the banana peel is active
+banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 
 # Object current coordinates
 # x = 0
@@ -187,6 +192,8 @@ acceleration_factor = 1.2
 crashed = False
 
 timer = pygame.time.Clock()
+
+banana_peel_active = True
 
 # Infinite loop
 while not crashed:
@@ -256,6 +263,19 @@ while not crashed:
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
+
+    if banana_peel_active :
+        print("banana peel active!!")
+        win.blit(pygame.image.load(banana_peel_image), (300, 420))  # Keep y-coordinate as 420
+        print(300-x)
+        # if banana_peel_timer <= 0:
+        if  300-x<=80:
+            print(x)
+
+            banana_peel_active = False  # Deactivate the banana peel
+            print("banana peel deactivated!!")
+            # banana_peel_x = random.randint(0, win_width - banana_w)
+            # banana_peel_timer = 5 * 30  # Reset the timer
 
     # Refresh the window
     pygame.display.update()
