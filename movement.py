@@ -1,6 +1,11 @@
 #Audio recording and fft came from the example at
 #https://gist.github.com/ZWMiller/53232427efc5088007cab6feee7c6e4c
 
+# pip install pygame
+# pip install pyaudio
+# pip install seaborn
+
+
 import pygame
 import sys
 from threading import Thread
