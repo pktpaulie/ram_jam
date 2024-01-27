@@ -1,15 +1,19 @@
 #Audio recording and fft came from the example at
 #https://gist.github.com/ZWMiller/53232427efc5088007cab6feee7c6e4c
 
+"""
+The following installations are required for the ram
+"""
 # pip install pygame
 # pip install pyaudio
 # pip install seaborn
 
-
-import pygame
 import sys
 from threading import Thread
 import os
+import pygame
+from pygame.locals import *
+
 try:
     import pyaudio
     import numpy as np
@@ -29,10 +33,12 @@ win = pygame.display.set_mode((500, 500))
 # Set the Pygame window name
 pygame.display.set_caption("Ramjam")
 
-# Load the background image 1
-background_i = os.path.abspath("Scenes/Background.png")
+# Load and transform the background image 1
+#background_1 = os.path.abspath("Background/Background.png")
+background_1 = "Background.png"
 
 #Load the sound
+#soundA_path = os.path.abspath("Effects/Accerlation-engine.wav")
 soundA=pygame.mixer.Sound("Accerlation-engine.wav")
 
 #Set up the microphone recording 
@@ -79,7 +85,7 @@ def load_background(img_location):
 
 
 # Load the car image
-car_image_trex = "TRex_Car2.png"
+car_image_trex = os.path.abspath("Character_Sprites/Bee_Car2.png")
 
 #TODO: Loading screen for game to start
 #TODO: Add this to a function and call in load
@@ -163,7 +169,7 @@ while not crashed:
     if keys[pygame.K_DOWN] and y < 600 - car_rect.height:
         y += current_vel
 
-    load_background(background_i)
+    load_background(background_1)
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
