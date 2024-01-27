@@ -66,7 +66,7 @@ initial_vel = 1
 acceleration_factor = 1.2
 
 # Current velocity
-current_vel = initial_vel
+current_vel = 0
 
 # Indicates Pygame is running
 crashed = False
