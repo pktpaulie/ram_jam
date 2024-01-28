@@ -2,7 +2,7 @@
 #https://gist.github.com/ZWMiller/53232427efc5088007cab6feee7c6e4c
 
 """
-The following installations are required for the ram
+The following installations are required for the ramjam to run
 """
 # pip install pygame
 # pip install pyaudio
@@ -61,6 +61,7 @@ background_images = [
 
 background_start = os.path.abspath("Background/Start.jpg")
 background_title = os.path.abspath("Background/Title.png")
+background_finish = os.path.abspath("Enemies_And_Obstacles/Checkered_Flag.png")
 title_image = pygame.image.load(background_title)
 title_image = pygame.transform.scale(title_image, (120, 120))
 start_image = pygame.image.load(background_start)
@@ -77,6 +78,7 @@ def draw_start_menu():
     #win.blit(start_image, (0, 0))
     pygame.display.update()
 
+# Load the gamer over screen
 def draw_game_over_screen():
    win.fill((0, 0, 0))
    font = pygame.font.SysFont('arial', 40)
@@ -108,9 +110,25 @@ background_change_timer = 0
 # Variable to control background scrolling speed
 background_scroll_speed = 2
 
-
 # Current velocity
 current_vel = 0
+
+# Acceleration factor
+acceleration_factor = 1.2
+
+crashed = False
+jumping = False
+jump_count = [5]
+banana_peel_active = True
+gaming = False
+
+# Object current coordinates
+x = 0
+y = 380
+start_y = y
+
+# Initial velocity / speed of movement
+initial_vel = 1
 
 # skid variables
 skid_active = False
@@ -118,7 +136,6 @@ skid_duration = 40  # Skid duration in frames
 skid_timer = 0
 
 skid_rotation_angle = 0
-
 
 #Load the in all sound effects
 soundAccel=pygame.mixer.Sound("./Effects/Acceleration.wav")
@@ -193,7 +210,7 @@ def micFunction(in_data, soundOne, soundTwo):
         if((maxLocation>15) and (maxLocation<40 ) and (max_vol>800)):
             slowAction()
         elif((maxLocation>40) and (maxLocation<90) and (max_vol>800)):
-            jumpAction()
+            jumpAction(jump_count)
         elif ((maxLocation>90) and (max_vol>800)):
             startStopAction()
             print(max_vol)
@@ -208,8 +225,18 @@ def accel_sound_function():
 def startStopAction():
     print("Soup")
 
-def jumpAction():
+
+def jumpAction(jump_val):
     print("Chime")
+    if jump_val[0] >= -5:
+        neg = 1
+        if jump_val[0] < 0:
+            neg = -1
+        y -= (jump_val[0] ** 2) * 0.5 * neg
+        jump_val[0] -= 1
+    else:
+        jumping = False
+        jump_val[0] = 5
 
 def slowAction():
     print("Cold")
@@ -217,7 +244,6 @@ def slowAction():
 def load_background(img_location, index, iterator):
     current_background = img_location[index]
     win.blit(current_background, (screen_width+iterator, 0))
-
 
 # Load the car image
 car_image_bee = os.path.abspath("Character_Sprites/Bee_Car2.png")
@@ -239,28 +265,17 @@ banana_w, banana_h = 50, 50
 banana_peel_active = False  # Flag to indicate if the banana peel is active
 banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 
-# Object current coordinates
-x = 0
-y = 380
-start_y = y
 
-# Initial velocity / speed of movement
-initial_vel = 1
 
-# Acceleration factor
-acceleration_factor = 1.2
 
-crashed = False
-jumping = False
-jump_count = 5
-banana_peel_active = True
-gaming = False
 
 timer = pygame.time.Clock()
 
 # Infinite loop
 while not crashed:
-    #pygame.time.delay(10)    
+    pygame.time.delay(10)    
+    #Start the mic recording. (You can comment the next line out to ignore)
+    micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
 
     for event in pygame.event.get():
         # Store keys pressed
@@ -268,16 +283,16 @@ while not crashed:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
-    
+
         if game_state == "start_up":
             #pygame.time.delay(10)
+            
             draw_start_menu()
             
             if event.type == pygame.KEYDOWN:
                 # Store keys pressed
                 keys = pygame.key.get_pressed()
                 if event.key == pygame.K_SPACE:
-
                     # Clear the screen
                     #win.fill((0, 0, 0))
                     #win.blit(background_images[0], (iterator, 0))
@@ -304,8 +319,7 @@ while not crashed:
 
         elif game_state == "game": 
             #pygame.time.delay(10)   
-            #Start the mic recording. (You can comment the next line out to ignore)
-            micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
+            
             win.blit(background_images[0], (iterator, 0))
 
             if event.type == pygame.KEYDOWN:
@@ -358,6 +372,7 @@ while not crashed:
 
         if current_vel == 0:
             soundAccel.stop()
+            soundIdle.play()
 
         # Ensure the car stays within the screen boundaries
         #x = max(0, min(x, screen_width*2/3 - car_rect.width))
@@ -374,7 +389,8 @@ while not crashed:
 
         # Jumping mechanism
         if jumping:
-            if jump_count >= -5:
+            jumpAction(jump_count)
+            """ if jump_count >= -5:
                 neg = 1
                 if jump_count < 0:
                     neg = -1
@@ -382,7 +398,7 @@ while not crashed:
                 jump_count -= 1
             else:
                 jumping = False
-                jump_count = 5
+                jump_count = 5 """
 
         # Simulated gravity when not jumping
         if not jumping and y < start_y: #screen_height - car_rect.height:
