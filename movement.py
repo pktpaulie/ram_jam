@@ -21,22 +21,19 @@ import random
 try:
     import pyaudio
     import numpy as np
-    #import pylab
     from scipy.io import wavfile
     import time
     import seaborn as sns
-    #from ctypes import c_int64
     
 except:
     print("Something didn't import")
 
 
-# GLOBAL VARIABLES
+"""
+GLOBAL VARIABLES
 
-
-
+""" 
 banana_w, banana_h = 50, 50
-#banana_peel_active = False  # Flag to indicate if the banana peel is active
 banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 banana_peel = [True]
 
@@ -58,8 +55,6 @@ acceleration_factor = 1.2
 
 is_jumping = [False]
 jump_val = [5]
-
-
 
 # Set skid variables
 skid = [False]
@@ -83,8 +78,10 @@ soundTimeTwo=[0]
 
 
 
+"""
+LOADING ASSETS 
 
-# LOADING ASSETS 
+""" 
 # Load and transform the background images
 background_1 = os.path.abspath("Background/Background1.png")
 background_2 = os.path.abspath("Background/Background2.png")
@@ -128,9 +125,11 @@ Explosion_image = pygame.transform.scale(Explosion_image, (120, 110))
 audio_path = "./Effects/car_skids.wav"
 
 
+"""
 
+FUNCTIONS
 
-# FUNCTIONS
+"""
 
 def startStopAction(current_speed): #Accelerate
     current_speed = accelerate(current_speed)
@@ -176,10 +175,6 @@ def micFunction(in_data, soundOne, soundTwo, current_vel):
     return current_vel
 
 
-# def load_background(img_location, index, iterator):
-#     current_background = img_location[index]
-#     win.blit(current_background, (screen_width+iterator, 0))
-
 # Load the start up menu
 def draw_start_menu(win):
     win.fill((0, 0, 0))
@@ -189,9 +184,6 @@ def draw_start_menu(win):
     win.blit(start_button, (screen_width/2 - start_button.get_width()/2, screen_height/2 + start_button.get_height()/2))
     #win.blit(start_image, (0, 0))
     pygame.display.update()
-
-
-
 
 def jumping(jumping, y_cord, jump_count):
     
@@ -231,8 +223,6 @@ def banana_function(skid_active, banana_peel_active, win, x, car_image_object, c
                 print("Skid initiated!!")
                 banana_peel_active[0] = False  # Deactivate the banana peel
                 print("banana peel deactivated!!")
-                #banana_peel_x = random.randint(0, screen_width - banana_w)
-                #banana_peel_timer = 5 * 30  # Reset the timer
                 soundSkid.play()  # Play skid sound when skid is initiated
 
             # Draw the rotating skid effect if a skid is active
@@ -266,8 +256,6 @@ def banana_function(skid_active, banana_peel_active, win, x, car_image_object, c
                     print("Skid initiated!!")
                     banana_peel_active[0] = False  # Deactivate the banana peel
                     print("banana peel deactivated!!")
-                    #banana_peel_x = random.randint(0, screen_width - banana_w)
-                    #banana_peel_timer = 5 * 30  # Reset the timer
                     soundSkid.play()  # Play skid sound when skid is initiated
 
                 elif skid_timer < 5000:  # Adjust the duration as needed
@@ -299,8 +287,7 @@ def accelerate(speed):
 # MAIN
 def __main__():
     monkey_active = False
-    # Object current coordinates
-    x = 0
+    x = 0       # Object current coordinates
     car_w, car_h = 100, 75
     crashed = False
     car_number = 0
@@ -309,13 +296,10 @@ def __main__():
     iterator = 0    # Start at 0 and iterate along width of screen
     # Set the initial background image and iterator
     current_background_index = 0
-
     # Variable to control background change
     background_change_timer = 0
-
     # Variable to control background scrolling speed
     background_scroll_speed = 2
-
     # Current velocity
     current_vel = 0
 
@@ -330,10 +314,7 @@ def __main__():
     # Set the Pygame window name
     pygame.display.set_caption("Ramjam")
 
-
-    game_state = "start_up"
-
-
+ 
     # Load the in all sound effects
     soundAccel=pygame.mixer.Sound("./Effects/Acceleration.wav")
     soundIdle=pygame.mixer.Sound("./Effects/idleEngine.wav")
@@ -342,7 +323,6 @@ def __main__():
     soundBanana=pygame.mixer.Sound("./Effects/banana.wav")
     soundMonkey=pygame.mixer.Sound("./Effects/monkey_sounds.wav")
     soundBounce=pygame.mixer.Sound("./Effects/bounce_tires.wav")
-    #soundSkid=pygame.mixer.Sound("./Effects/car_skids.wav")
     soundScream=pygame.mixer.Sound("./Effects/screaming.wav")
 
     """
@@ -394,10 +374,8 @@ def __main__():
        
         if current_time > (start_time + 20000):
             pygame.time.delay(10)
-            #print("gorilla")
             win.blit(monkey_image_object, (400, 310))
             monkey_active = True
-            print("Monkey is activated")
             pygame.display.update()
         
         if monkey_active ==True:
@@ -408,9 +386,9 @@ def __main__():
                 win.fill((0,0,0))
                 font = pygame.font.SysFont("arial", 40)
                 end_button = font.render("JAMMING OVER", True, (255, 255, 255))
-                #win.blit(Explosion_image,(screen_width/2,screen_height/2)) 
                 win.blit(Explosion_image, (screen_width/2 - Explosion_image.get_width()/2, screen_height/2 + Explosion_image.get_height()/2))
                 win.blit(end_button, (screen_width/2 - end_button.get_width()/2, screen_height/2 + end_button.get_height()/2))
+                soundScream.play()
                 pygame.display.update()
                 pygame.time.delay(1000)
                 pygame.quit()
@@ -458,8 +436,6 @@ def __main__():
                 if current_vel != 0 and not skid[0]:
                     T = Thread(target=accel_sound_function)
                     T.start()
-                    # soundAccel.play()
-                    # soundIdle.stop()
 
 
         # Store keys pressed
@@ -471,8 +447,6 @@ def __main__():
 
         # Move the car continuously in the positive x-direction
         x += current_vel
-        # Ensure the car stays within the screen boundaries
-        #x = max(0, min(x, screen_width*2/3 - car_rect.width))
         # If the car goes off the right side of the window, reset its position
         if x > screen_width + 50:
             x = 0 - car_rect.width
@@ -513,4 +487,3 @@ def __main__():
 
 if __name__ == "__main__":
     __main__()
-
