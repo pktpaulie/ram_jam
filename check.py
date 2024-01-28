@@ -265,10 +265,6 @@ banana_w, banana_h = 50, 50
 banana_peel_active = False  # Flag to indicate if the banana peel is active
 banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 
-
-
-
-
 timer = pygame.time.Clock()
 
 # Infinite loop
