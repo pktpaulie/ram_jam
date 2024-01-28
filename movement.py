@@ -21,11 +21,11 @@ import random
 try:
     import pyaudio
     import numpy as np
-    import pylab
+    #import pylab
     from scipy.io import wavfile
     import time
     import seaborn as sns
-    from ctypes import c_int64
+    #from ctypes import c_int64
     
 except:
     print("Something didn't import")
@@ -120,7 +120,7 @@ title_image = pygame.transform.scale(title_image, (120, 120))
 finish_image = pygame.image.load(background_finish)
 finish_image = pygame.transform.scale(finish_image, (100, 100))
 Explosion_image = pygame.image.load(background_explosion)
-# Explosion_image = pygame.transform.scale(Explosion_image, (100, 100))
+Explosion_image = pygame.transform.scale(Explosion_image, (120, 130))
 
 
 # Load the audio file
@@ -408,14 +408,25 @@ def __main__():
         pygame.time.delay(10)
         # Clear the screen  #win.fill((0, 0, 0))
        
-        if current_time > (start_time + 10000):
-            
+        if current_time > (start_time + 10000) and current_time < (start_time + 15000):
             pygame.time.delay(10)
             #print("gorilla")
             win.blit(monkey_image_object, (400, 310))
             monkey_active = True
             print("Monkey is activated")
             pygame.display.update()
+        
+        if monkey_active ==True:
+            if 400-x<=20 and x>0:
+                print("Car is closer!!")   
+                monkey_active=False
+                #crashed = True
+                win.fill((0,0,0))
+                win.blit(Explosion_image,(screen_width/2,screen_height/2)) 
+                pygame.display.update()
+                pygame.time.delay(1000)
+                pygame.quit()
+                quit()
 
         win.blit(background_images[0], (iterator, 0))
 
@@ -435,8 +446,7 @@ def __main__():
                     current_vel = deccelerate(current_vel)
                 elif event.key == pygame.K_q:
                     win.fill((0,0,0))
-                    win.blit(finish_image, (screen_width*0.75,screen_height*0.75))
-                    
+                    win.blit(finish_image, (screen_width*0.75,screen_height*0.75))  
                     pygame.display.update()
                     pygame.time.delay(1000)
                     pygame.quit()
@@ -484,28 +494,14 @@ def __main__():
         
         jumping(is_jumping, y, jump_val) # Car jump
         banana_function(skid, banana_peel, win, x, car_image_object, car_h, car_w, soundSkid, soundAccel)
-        if monkey_active ==True:
-
-            if 400-x<=20 and x>0:
-                print("Car is closer!!")
-                pygame.display.update()
-                win.fill((0,0,0))
-                win.blit(Explosion_image,(screen_width/2,screen_height/2))
-                pygame.time.delay(1000)
-                monkey_active=False
-                crashed = True
-
-
-                # pygame.time.delay(100)
-
-
-
-
+    
         #load_background(background_1, iterator)
         if current_vel > 0:
             iterator -= background_scroll_speed
             current_background = background_images[current_background_index]
             win.blit(current_background, (screen_width+iterator, 0))
+            if monkey_active:
+                win.blit(monkey_image_object, (400, 310))
             #load_background(background_images, current_background_index, iterator)
 
         # Draw the car image at the updated position
