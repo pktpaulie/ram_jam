@@ -40,17 +40,46 @@ pygame.display.set_caption("Ramjam")
 
 # Load and transform the background image 1
 #background_1 = os.path.abspath("Background/Background.png")
-background_1 = "Background1.png"
-background_2 = "Background2.png"
-background_3 = "Background3.png"
-background_4 = "Background4.png"
+background_images = [
+    pygame.image.load("Background1.png"),
+    pygame.image.load("Background2.png"),
+    pygame.image.load("Background3.png"),
+    pygame.image.load("Background4.png"),
+]
+
+#check image loaded and transform it
+def check_image_loading(img):
+    try:
+        background_image = pygame.image.load(img)
+    except pygame.error as e:
+        print(f"Error loading background image: {e}")
+        sys.exit(1)
+    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+    
+
+# background_1 = "Background1.png"
+# background_2 = "Background2.png"
+# background_3 = "Background3.png"
+# background_4 = "Background4.png"
 # background_1 = os.path.abspath("Background/Background1.png")
 # background_2 = os.path.abspath("Background/Background2.png")
 # background_3 = os.path.abspath("Background/Background3.png")
 # background_4 = os.path.abspath("Background/Background4.png")
 
-# Variable to iterate over the background image
+# Set initial background image
+#current_background = background_1
+
+# Variable to iterate over the background image  
 iterator = 0    # Start at 0 and iterate along width of screen
+# Set the initial background image and iterator
+current_background_index = 0
+
+# Variable to control background change
+background_change_timer = 0
+
+# Variable to control background scrolling speed
+background_scroll_speed = 2
+
 
 # Current velocity
 current_vel = 0
@@ -123,7 +152,6 @@ def accel_sound_function():
     soundAccel.stop()
     sys.exit()
 
-
 def startStopAction():
     print("Soup")
 
@@ -133,26 +161,28 @@ def jumpAction():
 def slowAction():
     print("Cold")
 
-def load_background(img_location, iterator):
-    try:
-        background_image = pygame.image.load(img_location)
-    except pygame.error as e:
-        print(f"Error loading background image: {e}")
-        sys.exit(1)
-
-    # Transform the background image
-    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+def load_background(img_location, index, iterator):
+    current_background = img_location[index]
+    #check_image_loading(current_background)
     
-    win.blit(background_image, (0, 0))
-    if current_vel != 0: 
-        win.blit(background_image, (iterator, 0))  
-        win.blit(background_image, (screen_width+iterator, 0))
+    # Transform the background image
+    #background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+    
+    #win.blit(current_background, (iterator, 0))
+    win.blit(current_background, (screen_width+iterator, 0))
+    # if iterator == -screen_width:
+    #     #win.blit(current_background, (screen_width+iterator, 0))
+    #     iterator = 0
+    """ if current_vel != 0: 
+        win.blit(current_background, (iterator, 0))  
+        win.blit(current_background, (screen_width+iterator, 0))
         if iterator == -screen_width:
-            win.blit(background_image, (screen_width+iterator, 0))
+            win.blit(current_background, (screen_width+iterator, 0))
             iterator = 0
-        iterator -= 1
+        #iterator -= 1 
     else:
-        win.blit(background_image, (0, 0))
+        #win.blit(current_background, (0, 0))
+        pass"""
 
 def update_background(img_location, iterator):
     try:
@@ -198,6 +228,7 @@ banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 # y = 200
 x = 0
 y = 380 #410
+start_y = y
 
 # Initial velocity / speed of movement
 initial_vel = 1
@@ -209,6 +240,8 @@ acceleration_factor = 1.2
 
 # Indicates Pygame is running/ not crashed
 crashed = False
+jumping = False
+jump_count = 5
 
 timer = pygame.time.Clock()
 
@@ -218,21 +251,10 @@ banana_peel_active = True
 while not crashed:
     pygame.time.delay(10)
     # Clear the screen
-    win.fill((0, 0, 0))
+    #win.fill((0, 0, 0))
 
-    if iterator == 0:
-        img = background_1
-    elif iterator == 1:
-        img = background_2
-    elif iterator == 2:
-        img = background_3
-    elif iterator == 3:
-        img = background_4
-
-    #win.blit(background_image, (iterator, 0))
-    load_background(img, iterator)
-    #update_background(background_1, iterator)
-    iterator-=1
+    win.blit(background_images[0], (iterator, 0))
+    
 
     #Start the mic recording. (You can comment the next line out to ignore)
     micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
@@ -281,23 +303,40 @@ while not crashed:
     # Move the car continuously in the positive x-direction
     x += current_vel
 
+    # Ensure the car stays within the screen boundaries
+    x = max(0, min(x, screen_width*2/3 - car_rect.width))
 
     # If the car goes off the right side of the window, reset its position
-    if x > screen_width + 50:
-        x = 0 - car_rect.width
+    # if x > screen_width + 50:
+    #     x = 0 - car_rect.width
 
     # Store keys pressed
     keys = pygame.key.get_pressed()
 
-    # Move up
-    if keys[pygame.K_UP] and y > 0:
-        y -= current_vel
+    
+    if keys[pygame.K_UP] and not jumping:   
+        jumping = True
 
-    # Move down
-    if keys[pygame.K_DOWN] and y < (screen_height + 100) - car_rect.height:
-        y += current_vel
+     # Jumping mechanism
+    if jumping:
+        if jump_count >= -5:
+            neg = 1
+            if jump_count < 0:
+                neg = -1
+            y -= (jump_count ** 2) * 0.5 * neg
+            jump_count -= 1
+        else:
+            jumping = False
+            jump_count = 5
+
+    # Simulated gravity when not jumping
+    if not jumping and y < start_y: #screen_height - car_rect.height:
+        y += 2
 
     #load_background(background_1, iterator)
+    if current_vel > 0:
+        iterator -= background_scroll_speed
+        load_background(background_images, current_background_index, iterator)
 
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
@@ -317,6 +356,12 @@ while not crashed:
 
     # Refresh the window
     pygame.display.update()
+
+    # Check if it's time to change the background
+    if iterator <= -screen_width:
+        current_background_index = (current_background_index + 1) % len(background_images)
+        iterator = 0
+
     timer.tick(30)
 # Close up mic recording
 stream.stop_stream()
