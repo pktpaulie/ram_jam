@@ -117,10 +117,11 @@ stream.start_stream()
 soundTimeOne=[0]
 soundTimeTwo=[0]
  
-#Function for mic in
+# Function for mic in
 def micFunction(in_data, soundOne, soundTwo):
     soundOne[0]=pygame.time.get_ticks()
     audio_data = np.fromstring(in_data, np.int16)
+    max_vol = np.argmax(audio_data)
     dfft = 10.*np.log10(abs(np.fft.rfft(audio_data)))
     maxLocation=np.argmax(dfft)
     #maxLocation corresponds to the frequency of the most intense sound
@@ -135,16 +136,14 @@ def micFunction(in_data, soundOne, soundTwo):
         soundTwo[0]=pygame.time.get_ticks()
         soundTimeTwo[0]=soundTwo[0]
         
-        if((maxLocation>15) and(maxLocation<40 )):
+        if((maxLocation>15) and (maxLocation<40 ) and (max_vol>800)):
             slowAction()
-        elif((maxLocation>40) and (maxLocation<90) ):
+        elif((maxLocation>40) and (maxLocation<90) and (max_vol>800)):
             jumpAction()
-        elif (maxLocation>90):
+        elif ((maxLocation>90) and (max_vol>800)):
             startStopAction()
+            print(max_vol)
      
-
-
-
 #Separate thread for the sound effect
 def accel_sound_function():
     soundAccel.play(0)
