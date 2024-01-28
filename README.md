@@ -1,4 +1,4 @@
-# Ramjam ![RamJam image](/Backround/Title.png)
+# Ramjam ![RamJam image](/Background/Title.png)
 
 A racing game developed during the Global Game Jam GGJ 2024.
 Ramjam is a sing-to-drive game. 
