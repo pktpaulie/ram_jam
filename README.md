@@ -12,9 +12,7 @@ pip install seaborn <br>
 pip install pydub <br>
 pip install threading <br>
 pip install numpy <br>
-pip install pylab <br>
 pip install scipy.io <br>
-pip install ctypes <br>
 
 ### Driving Instructions
 Up Arrow = Jump <br>
