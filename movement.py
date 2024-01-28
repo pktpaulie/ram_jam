@@ -120,7 +120,8 @@ title_image = pygame.transform.scale(title_image, (120, 120))
 finish_image = pygame.image.load(background_finish)
 finish_image = pygame.transform.scale(finish_image, (100, 100))
 Explosion_image = pygame.image.load(background_explosion)
-Explosion_image = pygame.transform.scale(Explosion_image, (120, 130))
+Explosion_image = pygame.transform.scale(Explosion_image, (120, 110))
+
 
 
 # Load the audio file
@@ -188,6 +189,8 @@ def draw_start_menu(win):
     win.blit(start_button, (screen_width/2 - start_button.get_width()/2, screen_height/2 + start_button.get_height()/2))
     #win.blit(start_image, (0, 0))
     pygame.display.update()
+
+
 
 
 def jumping(jumping, y_cord, jump_count):
@@ -330,25 +333,6 @@ def __main__():
 
     game_state = "start_up"
 
-    # # Load the start up menu
-    # def draw_start_menu():
-    #     win.fill((0, 0, 0))
-    #     font = pygame.font.SysFont("arial", 40)
-    #     title = font.render("Ramjam", True, (255, 255, 255))
-    #     start_button = font.render("Start", True, (255, 255, 255))
-    #     win.blit(title, (screen_width/2 - title.get_width()/2, screen_height/2 - title.get_height()/2))
-    #     win.blit(start_button, (screen_width/2 - start_button.get_width()/2, screen_height/2 + start_button.get_height()/2))
-    #     pygame.display.update()
-
-    # #check image loaded and transform it
-    # def check_image_loading(img):
-    #     try:
-    #         background_image = pygame.image.load(img)
-    #     except pygame.error as e:
-    #         print(f"Error loading background image: {e}")
-    #         sys.exit(1)
-    #     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
-        
 
     # Load the in all sound effects
     soundAccel=pygame.mixer.Sound("./Effects/Acceleration.wav")
@@ -408,7 +392,7 @@ def __main__():
         pygame.time.delay(10)
         # Clear the screen  #win.fill((0, 0, 0))
        
-        if current_time > (start_time + 10000) and current_time < (start_time + 15000):
+        if current_time > (start_time + 20000):
             pygame.time.delay(10)
             #print("gorilla")
             win.blit(monkey_image_object, (400, 310))
@@ -422,7 +406,11 @@ def __main__():
                 monkey_active=False
                 #crashed = True
                 win.fill((0,0,0))
-                win.blit(Explosion_image,(screen_width/2,screen_height/2)) 
+                font = pygame.font.SysFont("arial", 40)
+                end_button = font.render("JAMMING OVER", True, (255, 255, 255))
+                #win.blit(Explosion_image,(screen_width/2,screen_height/2)) 
+                win.blit(Explosion_image, (screen_width/2 - Explosion_image.get_width()/2, screen_height/2 + Explosion_image.get_height()/2))
+                win.blit(end_button, (screen_width/2 - end_button.get_width()/2, screen_height/2 + end_button.get_height()/2))
                 pygame.display.update()
                 pygame.time.delay(1000)
                 pygame.quit()
