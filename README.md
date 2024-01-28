@@ -25,4 +25,5 @@ C = Changes car <br>
 Saying "Cold" in mic = Deaccelerate <br>
 Saying "Soup" in mic = Accelerate <br>
 Saying "Chime" in mic = Jump <br>
+Q = Quit <br>
   
