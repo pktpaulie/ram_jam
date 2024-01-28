@@ -13,6 +13,8 @@ from threading import Thread
 import os
 import pygame
 from pygame.locals import *
+from pydub import AudioSegment
+import random
 
 try:
     import pyaudio
@@ -84,6 +86,13 @@ background_scroll_speed = 2
 # Current velocity
 current_vel = 0
 
+# skid variables
+skid_active = False
+skid_duration = 40  # Skid duration in frames
+skid_timer = 0
+
+skid_rotation_angle = 0
+
 
 #Load the in all sound effects
 soundAccel=pygame.mixer.Sound("./Effects/Acceleration.wav")
@@ -93,8 +102,27 @@ soundStop=pygame.mixer.Sound("./Effects/stopEngine.wav")
 soundBanana=pygame.mixer.Sound("./Effects/banana.wav")
 soundMonkey=pygame.mixer.Sound("./Effects/monkey_sounds.wav")
 soundBounce=pygame.mixer.Sound("./Effects/bounce_tires.wav")
-soundSkid=pygame.mixer.Sound("./Effects/car_skids.wav")
+#soundSkid=pygame.mixer.Sound("./Effects/car_skids.wav")
 soundScream=pygame.mixer.Sound("./Effects/screaming.wav")
+
+
+# Load the audio file
+audio_path = "./Effects/car_skids.wav"
+audio = AudioSegment.from_file(audio_path)
+
+# Set the duration you want to keep
+duration_to_keep = 3 * 1000  # Keep the first 3 seconds (convert to milliseconds)
+
+# Shorten the audio
+shortened_audio = audio[duration_to_keep:]
+
+# Export the shortened audio to a new file
+output_path = "./Effects/shortened_skids.wav"
+shortened_audio.export(output_path, format="wav")
+
+# Update the soundSkid variable to use the shortened audio
+soundSkid = pygame.mixer.Sound(output_path)
+
 
 #Set up the microphone recording 
 FORMAT = pyaudio.paInt16 # We use 16bit format per sample
@@ -146,9 +174,9 @@ def micFunction(in_data, soundOne, soundTwo):
      
 #Separate thread for the sound effect
 def accel_sound_function():
-    soundAccel.play(0)
+    soundAccel.play(10000)
     pygame.time.delay(1000)  #Play the sound for 1000 milliseconds
-    soundAccel.stop()
+    # soundAccel.stop()
     sys.exit()
 
 def startStopAction():
@@ -256,7 +284,7 @@ while not crashed:
     
 
     #Start the mic recording. (You can comment the next line out to ignore)
-    micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
+    # micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -269,8 +297,7 @@ while not crashed:
                     current_vel = 10
                 else:
                     current_vel += acceleration_factor
-                    T=Thread(target=accel_sound_function)
-                    T.start()
+
                      
             elif event.key == pygame.K_LEFT:
                 if current_vel > 0:
@@ -294,13 +321,18 @@ while not crashed:
                     car_rect = car_image_object.get_rect()
                 car_number=(car_number+1)%3
 
+            if current_vel != 0 and not skid_active:
+                T = Thread(target=accel_sound_function)
+                T.start()
 
-                    
 
-    
+
 
     # Move the car continuously in the positive x-direction
     x += current_vel
+
+    if current_vel == 0:
+        soundAccel.stop()
 
     # Ensure the car stays within the screen boundaries
     x = max(0, min(x, screen_width*2/3 - car_rect.width))
@@ -340,18 +372,70 @@ while not crashed:
     # Draw the car image at the updated position
     win.blit(car_image_object, (x, y))
 
-    if banana_peel_active :
-        #print("banana peel active!!")
-        win.blit(pygame.image.load(banana_peel_image), (300, 420))  # Keep y-coordinate as 420
-        #print(300-x)
-        # if banana_peel_timer <= 0:
-        if  300-x<=80:
-            print(x)
+    if skid_active:
+        skid_timer += 1
+        if skid_timer >= skid_duration:
+            skid_active = False
+            skid_timer = 0
+            current_vel = 0  # Stop the car after skid
+            soundAccel.play()  # Resume acceleration sound
 
+    if banana_peel_active:
+        print("banana peel active!!")
+        win.blit(pygame.image.load(banana_peel_image), (240, 420))  # Keep y-coordinate as 420
+
+        # Check for skid initiation
+        if 240 - x <= 80 and not skid_active:
+            skid_active = True
+            skid_timer = 0
+            skid_rotation_angle = 60  # Set an initial rotation angle
+            print("Skid initiated!!")
             banana_peel_active = False  # Deactivate the banana peel
             print("banana peel deactivated!!")
-            # banana_peel_x = random.randint(0, win_width - banana_w)
-            # banana_peel_timer = 5 * 30  # Reset the timer
+            print("I am here")
+            banana_peel_x = random.randint(0, screen_width - banana_w)
+            banana_peel_timer = 5 * 30  # Reset the timer
+            soundSkid.play()  # Play skid sound when skid is initiated
+
+        # Draw the rotating skid effect if a skid is active
+        if skid_active:
+            print("I am there!!")
+            for _ in range(5):  # Rotate the car 5 times for a short duration
+                rotated_car = pygame.transform.rotate(car_image_object, skid_rotation_angle)
+                rotated_car_rect = rotated_car.get_rect(center=(x + car_w / 2, y + car_h / 2))
+                win.blit(rotated_car, rotated_car_rect.topleft)
+                pygame.display.update()  # Update the display to show the rotated image
+                pygame.time.delay(50)  # Delay to control the speed of rotation
+
+            # Update the total skid rotation angle for the next frame
+            skid_rotation_angle += 5  # Increase the rotation speed
+
+            # Check for the end of skid effect
+            if skid_rotation_angle >= 360 * 4:  # Rotate 4 times (adjust as needed)
+                skid_active = False
+                soundSkid.stop()  # Stop skid sound when skid effect ends
+                soundAccel.play()  # Resume acceleration sound
+
+        else:
+            # Draw the car image at the updated position without rotation
+            win.blit(car_image_object, (x, y))
+            # Check for skid initiation
+            if 300 - x <= 80 and not skid_active:
+                skid_active = True
+                skid_timer = 0
+                print("Skid initiated!!")
+                banana_peel_active = False  # Deactivate the banana peel
+                print("banana peel deactivated!!")
+                banana_peel_x = random.randint(0, screen_width - banana_w)
+                banana_peel_timer = 5 * 30  # Reset the timer
+                soundSkid.play()  # Play skid sound when skid is initiated
+
+            elif skid_timer < 5000:  # Adjust the duration as needed
+                skid_timer += 1
+            else:
+                skid_active = False
+                soundSkid.stop()  # Stop skid sound when skid effect ends
+                soundAccel.play()
 
     # Refresh the window
     pygame.display.update()
