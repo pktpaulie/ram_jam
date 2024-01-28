@@ -7,6 +7,8 @@ The following installations are required for the ram
 # pip install pygame
 # pip install pyaudio
 # pip install seaborn
+# pip install pydub
+
 
 import sys
 from threading import Thread
@@ -145,10 +147,11 @@ stream.start_stream()
 soundTimeOne=[0]
 soundTimeTwo=[0]
  
-#Function for mic in
+# Function for mic in
 def micFunction(in_data, soundOne, soundTwo):
     soundOne[0]=pygame.time.get_ticks()
     audio_data = np.fromstring(in_data, np.int16)
+    max_vol = np.argmax(audio_data)
     dfft = 10.*np.log10(abs(np.fft.rfft(audio_data)))
     maxLocation=np.argmax(dfft)
     #maxLocation corresponds to the frequency of the most intense sound
@@ -163,16 +166,14 @@ def micFunction(in_data, soundOne, soundTwo):
         soundTwo[0]=pygame.time.get_ticks()
         soundTimeTwo[0]=soundTwo[0]
         
-        if((maxLocation>15) and(maxLocation<40 )):
+        if((maxLocation>15) and (maxLocation<40 ) and (max_vol>800)):
             slowAction()
-        elif((maxLocation>40) and (maxLocation<90) ):
+        elif((maxLocation>40) and (maxLocation<90) and (max_vol>800)):
             jumpAction()
-        elif (maxLocation>90):
+        elif ((maxLocation>90) and (max_vol>800)):
             startStopAction()
+            print(max_vol)
      
-
-
-
 #Separate thread for the sound effect
 def accel_sound_function():
     soundAccel.play(10000)
@@ -285,7 +286,7 @@ while not crashed:
     
 
     #Start the mic recording. (You can comment the next line out to ignore)
-    # micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
+    micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -294,6 +295,7 @@ while not crashed:
             if event.key == pygame.K_SPACE:
                 current_vel = initial_vel
             elif event.key == pygame.K_RIGHT:
+                
                 if current_vel >= 10:
                     current_vel = 10
                 else:
@@ -305,7 +307,7 @@ while not crashed:
                     current_vel -= acceleration_factor
                 else:
                     current_vel = 0
-            #change car style if user presses C
+            # change car style if user presses C
             elif event.key == pygame.K_c:
                 car_w, car_h = 100, 75
                 if(car_number==0):
@@ -336,11 +338,12 @@ while not crashed:
         soundAccel.stop()
 
     # Ensure the car stays within the screen boundaries
-    x = max(0, min(x, screen_width*2/3 - car_rect.width))
+    
+    #x = max(0, min(x, screen_width*2/3 - car_rect.width))
 
     # If the car goes off the right side of the window, reset its position
-    # if x > screen_width + 50:
-    #     x = 0 - car_rect.width
+    if x > screen_width + 50:
+        x = 0 - car_rect.width
 
     # Store keys pressed
     keys = pygame.key.get_pressed()
@@ -382,7 +385,7 @@ while not crashed:
             soundAccel.play()  # Resume acceleration sound
 
     if banana_peel_active:
-        print("banana peel active!!")
+        #print("banana peel active!!")
         win.blit(pygame.image.load(banana_peel_image), (240, 420))  # Keep y-coordinate as 420
 
         # Check for skid initiation
@@ -416,6 +419,8 @@ while not crashed:
                 skid_active = False
                 soundSkid.stop()  # Stop skid sound when skid effect ends
                 soundAccel.play()  # Resume acceleration sound
+            skid_active = False
+            print(skid_active)
 
         else:
             # Draw the car image at the updated position without rotation
@@ -437,6 +442,7 @@ while not crashed:
                 skid_active = False
                 soundSkid.stop()  # Stop skid sound when skid effect ends
                 soundAccel.play()
+            
 
     # Refresh the window
     pygame.display.update()
