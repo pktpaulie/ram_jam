@@ -32,7 +32,8 @@ except:
 
 
 # GLOBAL VARIABLES
-    
+
+
 
 banana_w, banana_h = 50, 50
 #banana_peel_active = False  # Flag to indicate if the banana peel is active
@@ -113,10 +114,13 @@ monkey_image = os.path.abspath("Enemies_And_Obstacles/Monkey1.png")
 # Start and Finish Images
 background_title = os.path.abspath("Background/Title.png")
 background_finish = os.path.abspath("Enemies_And_Obstacles/Checkered_Flag.png")
+background_explosion = os.path.abspath("Character_Sprites/Explosion.png")
 title_image = pygame.image.load(background_title)
 title_image = pygame.transform.scale(title_image, (120, 120))
 finish_image = pygame.image.load(background_finish)
 finish_image = pygame.transform.scale(finish_image, (100, 100))
+Explosion_image = pygame.image.load(background_explosion)
+# Explosion_image = pygame.transform.scale(Explosion_image, (100, 100))
 
 
 # Load the audio file
@@ -291,7 +295,7 @@ def accelerate(speed):
 
 # MAIN
 def __main__():
-
+    monkey_active = False
     # Object current coordinates
     x = 0
     car_w, car_h = 100, 75
@@ -410,6 +414,7 @@ def __main__():
             #print("gorilla")
             win.blit(monkey_image_object, (400, 310))
             monkey_active = True
+            print("Monkey is activated")
             pygame.display.update()
 
         win.blit(background_images[0], (iterator, 0))
@@ -478,7 +483,23 @@ def __main__():
             is_jumping[0] = True
         
         jumping(is_jumping, y, jump_val) # Car jump
-        banana_function(skid, banana_peel, win, x, car_image_object, car_h, car_w, soundSkid, soundAccel) 
+        banana_function(skid, banana_peel, win, x, car_image_object, car_h, car_w, soundSkid, soundAccel)
+        if monkey_active ==True:
+
+            if 400-x<=20 and x>0:
+                print("Car is closer!!")
+                pygame.display.update()
+                win.fill((0,0,0))
+                win.blit(Explosion_image,(screen_width/2,screen_height/2))
+                pygame.time.delay(1000)
+                monkey_active=False
+                crashed = True
+
+
+                # pygame.time.delay(100)
+
+
+
 
         #load_background(background_1, iterator)
         if current_vel > 0:
