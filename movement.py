@@ -42,14 +42,35 @@ win = pygame.display.set_mode((screen_width, screen_height))
 # Set the Pygame window name
 pygame.display.set_caption("Ramjam")
 
-# Load and transform the background image 1
-#background_1 = os.path.abspath("Background/Background.png")
+# Load and transform the background images
+background_1 = os.path.abspath("Background/Background1.png")
+background_2 = os.path.abspath("Background/Background2.png")
+background_3 = os.path.abspath("Background/Background3.png")
+background_4 = os.path.abspath("Background/Background4.png")
+background_5 = os.path.abspath("Background/Background5.png")
+background_6 = os.path.abspath("Background/Background6.png")
+
 background_images = [
-    pygame.image.load("Background1.png"),
-    pygame.image.load("Background2.png"),
-    pygame.image.load("Background3.png"),
-    pygame.image.load("Background4.png"),
+    pygame.image.load(background_1),
+    pygame.image.load(background_2),
+    pygame.image.load(background_3),
+    pygame.image.load(background_4),
+    pygame.image.load(background_5),
+    pygame.image.load(background_6),
 ]
+
+
+game_state = "start_up"
+
+# Load the start up menu
+def draw_start_menu():
+    win.fill((0, 0, 0))
+    font = pygame.font.SysFont("arial", 40)
+    title = font.render("Ramjam", True, (255, 255, 255))
+    start_button = font.render("Start", True, (255, 255, 255))
+    win.blit(title, (screen_width/2 - title.get_width()/2, screen_height/2 - title.get_height()/2))
+    win.blit(start_button, (screen_width/2 - start_button.get_width()/2, screen_height/2 + start_button.get_height()/2))
+    pygame.display.update()
 
 #check image loaded and transform it
 def check_image_loading(img):
@@ -60,15 +81,6 @@ def check_image_loading(img):
         sys.exit(1)
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
     
-
-# background_1 = "Background1.png"
-# background_2 = "Background2.png"
-# background_3 = "Background3.png"
-# background_4 = "Background4.png"
-# background_1 = os.path.abspath("Background/Background1.png")
-# background_2 = os.path.abspath("Background/Background2.png")
-# background_3 = os.path.abspath("Background/Background3.png")
-# background_4 = os.path.abspath("Background/Background4.png")
 
 # Set initial background image
 #current_background = background_1
@@ -230,14 +242,10 @@ def update_background(img_location, iterator):
 
 # Load the car image
 car_image_bee = os.path.abspath("Character_Sprites/Bee_Car2.png")
-banana_peel_image = "Banana_Peel.png"
+banana_peel_image = os.path.abspath("Effects/Banana_Peel.png")
 car_image_trex = os.path.abspath("Character_Sprites/TRex_Car2.png")
 car_image_chicken=os.path.abspath("Character_Sprites/Chicken_Car2.png")
 
-#TODO: Loading screen for game to start
-#TODO: Add this to a function and call in load
-#TODO: Background for next scene / loop background for current level then load new bg for new level
-#TODO: Bigger images??
 
 car_image_object = pygame.image.load(car_image_trex)
 car_rect_orig = car_image_object.get_rect()
@@ -253,8 +261,7 @@ banana_peel_active = False  # Flag to indicate if the banana peel is active
 banana_peel_timer = 5 * 30  # Timer for 5 seconds (30 frames per second)
 
 # Object current coordinates
-# x = 0
-# y = 200
+
 x = 0
 y = 380 #410
 start_y = y
