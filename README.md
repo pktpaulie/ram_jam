@@ -17,12 +17,12 @@ pip install scipy.io <br>
 pip install ctypes <br>
 
 ### Driving Instructions
-Up Arrow = Jump
-Right Arrow = Accelerate
-Left Arrow = Deaccelerate
-Spacebar = Start
-C = Changes car
-Saying "Cold" in mic = Deaccelerate
-Saying "Soup" in mic = Accelerate
-Saying "Chime" in mic = Jump
+Up Arrow = Jump <br>
+Right Arrow = Accelerate <br>
+Left Arrow = Deaccelerate <br>
+Spacebar = Start <br>
+C = Changes car <br>
+Saying "Cold" in mic = Deaccelerate <br>
+Saying "Soup" in mic = Accelerate <br>
+Saying "Chime" in mic = Jump <br>
   
