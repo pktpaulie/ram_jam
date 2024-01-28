@@ -126,20 +126,23 @@ audio_path = "./Effects/car_skids.wav"
 
 # FUNCTIONS
 
-def startStopAction(): #Accelerate
+def startStopAction(current_speed): #Accelerate
+    current_speed = accelerate(current_speed)
     print("Soup")
+    return current_speed
 
 def jumpAction():
     is_jumping[0] = True
     jumping(is_jumping, y, jump_val)
     print("Chime")
 
-def slowAction():
-
+def slowAction(current_speed):
+    current_speed = deccelerate(current_speed)
     print("Cold")
+    return current_speed
 
 # Function for mic in
-def micFunction(in_data, soundOne, soundTwo):
+def micFunction(in_data, soundOne, soundTwo, current_vel):
     soundOne[0]=pygame.time.get_ticks()
     audio_data = np.fromstring(in_data, np.int16)
     max_vol = np.argmax(audio_data)
@@ -154,17 +157,18 @@ def micFunction(in_data, soundOne, soundTwo):
     #The if statement is for the debouncing of the mic.
     #Only go on if it is more than 200ms since the last sound.
     if(soundOne[0]>(soundTwo[0]+200)):
-
         soundTwo[0]=pygame.time.get_ticks()
         soundTimeTwo[0]=soundTwo[0]
         
-        if((maxLocation>15) and (maxLocation<40 ) and (max_vol>volume_threshold)):
-            slowAction()
+        if((maxLocation>12) and (maxLocation<40 ) and (max_vol>volume_threshold)):
+            current_vel = slowAction(current_vel)
         elif((maxLocation>40) and (maxLocation<90) and (max_vol>volume_threshold)):
             jumpAction()
         elif ((maxLocation>90) and (max_vol>volume_threshold)):
-            startStopAction()
-            print(max_vol)
+            current_vel = startStopAction(current_vel)
+            #print(max_vol)
+    return current_vel
+
 
 # def load_background(img_location, index, iterator):
 #     current_background = img_location[index]
@@ -197,7 +201,6 @@ def jumping(jumping, y_cord, jump_count):
     # Simulated gravity when not jumping
     if not jumping[0] and y_cord[0] < start_y: #screen_height - car_rect.height:
         y_cord[0] += 2
-        print("gravity")
 
 def banana_function(skid_active, banana_peel_active, win, x, car_image_object, car_h, car_w, soundSkid, soundAccel):
         skid_timer = 0
@@ -266,9 +269,23 @@ def banana_function(skid_active, banana_peel_active, win, x, car_image_object, c
                     soundSkid.stop()  # Stop skid sound when skid effect ends
                     soundAccel.play()
 
+def deccelerate(current_vel):
+    if current_vel > 0:
+        current_vel -= acceleration_factor
+        print("Deccelerating*****")
+        print(current_vel)
+    else:
+        current_vel = 0
+    return current_vel
 
 def accelerate(speed):
-    pass
+    if speed >= 15:
+        speed = 15
+    else:
+        print("Accelerating*****")
+        speed += acceleration_factor
+        print(speed)
+    return speed
 
 
 # MAIN
@@ -385,7 +402,7 @@ def __main__():
         win.blit(background_images[0], (iterator, 0))
 
         #Start the mic recording. (You can comment the next line out to ignore)
-        micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo)
+        current_vel = micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo, current_vel)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -394,17 +411,19 @@ def __main__():
                 if event.key == pygame.K_SPACE:
                     current_vel = initial_vel
                 elif event.key == pygame.K_RIGHT:
-                    
-                    if current_vel >= 10:
-                        current_vel = 10
-                    else:
-                        current_vel += acceleration_factor
+                    current_vel = accelerate(current_vel)
+                    # if current_vel >= 10:
+                    #     current_vel = 10
+                    # else:
+                    #     current_vel += acceleration_factor
+                    #     print(current_vel)
            
                 elif event.key == pygame.K_LEFT:
-                    if current_vel > 0:
-                        current_vel -= acceleration_factor
-                    else:
-                        current_vel = 0
+                    current_vel = deccelerate(current_vel)
+                    # if current_vel > 0:
+                    #     current_vel -= acceleration_factor
+                    # else:
+                    #     current_vel = 0
                 # Change car style if user presses C
                 elif event.key == pygame.K_c:
                     car_w, car_h = 100, 75
