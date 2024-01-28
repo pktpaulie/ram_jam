@@ -53,8 +53,6 @@ initial_vel = 1
 # Acceleration factor
 acceleration_factor = 1.2
 
-
-
 # Indicates Pygame is running/ not crashed
 
 is_jumping = [False]
@@ -108,6 +106,9 @@ car_image_bee = os.path.abspath("Character_Sprites/Bee_Car2.png")
 banana_peel_image = os.path.abspath("Effects/Banana_Peel.png")
 car_image_trex = os.path.abspath("Character_Sprites/TRex_Car2.png")
 car_image_chicken=os.path.abspath("Character_Sprites/Chicken_Car2.png")
+monkey_image = os.path.abspath("Enemies_And_Obstacles/Monkey1.png")
+
+
 
 # Start and Finish Images
 background_title = os.path.abspath("Background/Title.png")
@@ -115,7 +116,7 @@ background_finish = os.path.abspath("Enemies_And_Obstacles/Checkered_Flag.png")
 title_image = pygame.image.load(background_title)
 title_image = pygame.transform.scale(title_image, (120, 120))
 finish_image = pygame.image.load(background_finish)
-finish_image = pygame.transform.scale(finish_image, (120, 120))
+finish_image = pygame.transform.scale(finish_image, (100, 100))
 
 
 # Load the audio file
@@ -314,6 +315,8 @@ def __main__():
     # Initialize Pygame
     pygame.init()
 
+    start_time = pygame.time.get_ticks()
+    current_time = start_time
     # Create the display surface object of specific dimensions 
     win = pygame.display.set_mode((screen_width, screen_height))
     
@@ -385,9 +388,9 @@ def __main__():
     car_image_object = pygame.image.load(car_image_trex)
     car_rect_orig = car_image_object.get_rect()
     car_image_object = pygame.transform.scale(car_image_object, (car_w, car_h))
-    car_rect = car_image_object.get_rect()
-
-    
+    car_rect = car_image_object.get_rect()   
+    monkey_image_object = pygame.image.load(monkey_image)
+    monkey_image_object = pygame.transform.scale(monkey_image_object, (120, 120))
 
     timer = pygame.time.Clock()
 
@@ -396,13 +399,24 @@ def __main__():
 
     # Infinite loop
     while not crashed:
+        current_time = pygame.time.get_ticks()
+
         pygame.time.delay(10)
         # Clear the screen  #win.fill((0, 0, 0))
        
+        if current_time > (start_time + 10000):
+            
+            pygame.time.delay(10)
+            #print("gorilla")
+            win.blit(monkey_image_object, (400, 310))
+            monkey_active = True
+            pygame.display.update()
+
         win.blit(background_images[0], (iterator, 0))
 
         #Start the mic recording. (You can comment the next line out to ignore)
         current_vel = micFunction(stream.read(CHUNK), soundTimeOne, soundTimeTwo, current_vel)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -412,19 +426,16 @@ def __main__():
                     current_vel = initial_vel
                 elif event.key == pygame.K_RIGHT:
                     current_vel = accelerate(current_vel)
-                    # if current_vel >= 10:
-                    #     current_vel = 10
-                    # else:
-                    #     current_vel += acceleration_factor
-                    #     print(current_vel)
-           
                 elif event.key == pygame.K_LEFT:
                     current_vel = deccelerate(current_vel)
-                    # if current_vel > 0:
-                    #     current_vel -= acceleration_factor
-                    # else:
-                    #     current_vel = 0
-                # Change car style if user presses C
+                elif event.key == pygame.K_q:
+                    win.fill((0,0,0))
+                    win.blit(finish_image, (screen_width*0.75,screen_height*0.75))
+                    
+                    pygame.display.update()
+                    pygame.time.delay(1000)
+                    pygame.quit()
+                    quit()
                 elif event.key == pygame.K_c:
                     car_w, car_h = 100, 75
                     if(car_number==0):
