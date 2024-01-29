@@ -24,4 +24,9 @@ Saying "Cold" in mic = Deaccelerate <br>
 Saying "Soup" in mic = Accelerate <br>
 Saying "Chime" in mic = Jump <br>
 Q = Quit <br>
-  
+
+Game running <br>
+![image](https://github.com/pktpaulie/ram_jam/assets/49090403/e2bc3188-350c-4333-94da-9792e4efb160)
+
+
+
